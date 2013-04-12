@@ -15,22 +15,13 @@ namespace ControlEmpleadosEntity
         public DateTime Nacimiento { get; set; }
         public uint Sueldo { get; set; }
 
-        public bool TieneEmail() {            
-            if (this.Mail.Equals("")){
-                return false;
-            }
-            else{
-                return true;
-            }
+        public bool TieneEmail() {
+            return !String.IsNullOrEmpty(this.Mail);
         }
 
         public bool TieneFechaNacimiento()
         {
-            if (this.Nacimiento.Equals("")){
-                return false;
-            }else{
-                return true;
-            }
+            return this.Nacimiento != null;
         }
 
 	}

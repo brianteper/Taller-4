@@ -18,6 +18,7 @@ namespace ControlEmpleadosDataODBC
 		/// </summary>
 		private const string SQLSearchByPrimaryKey = "SELECT * FROM Empleado WHERE EmpleadoLegajo = ?";
 		private const string SQLInsert = "INSERT INTO Empleado (EmpleadoLegajo, EmpleadoApellido, EmpleadoNombre, EmpleadoTelefono, EmpleadoEmail, EmpleadoFechaNacimiento, EmpleadoSueldo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        private const string SQLSearchByFilters = "SELECT * FROM Empleado WHERE EmpleadoLegajo LIKE ? AND EmpleadoApellido LIKE ? AND EmpleadoNombre LIKE ?";
 
         private daConexion connectionDA = new daConexion();
 
@@ -261,14 +262,16 @@ namespace ControlEmpleadosDataODBC
                 // Se obtiene una conexión abierta.
                 connection = (OdbcConnection)connectionDA.GetOpenedConnection();
                 // Se crea el comando con la sentencia Select.
-                command = new OdbcCommand(SQLSearchByPrimaryKey, connection);
+                command = new OdbcCommand(SQLSearchByFilters, connection);
                 // Se agrega el parámetro Legajo y se le asigna el valor.
                 command.Parameters.Add("?", OdbcType.VarChar);
+                command.Parameters[0].Value = "%" + legajo + "%";
+
                 command.Parameters.Add("?", OdbcType.VarChar);
+                command.Parameters[1].Value = "%" + apellido + "%";
+
                 command.Parameters.Add("?", OdbcType.VarChar);
-                command.Parameters[0].Value = legajo;
-                command.Parameters[1].Value = apellido;
-                command.Parameters[2].Value = nombre;
+                command.Parameters[2].Value = "%" + nombre + "%";
 
                 // Se ejecuta el comando y devuelve un objeto del tipo DataReader
                 // con los datos del empleado.
