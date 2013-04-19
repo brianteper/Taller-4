@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "ORT - Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Chat</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.EditorForModel();
+
+    <input id="send" value="Send" type="button" />
+    <ul id="messages" style="list-style: none;"></ul>
+}
+
+@section Scripts {
+    <script src="~/Scripts/ChatR.js"></script>
+}

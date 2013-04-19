@@ -28,5 +28,11 @@ namespace ORTChatMVC.Controllers
 
             return View();
         }
+
+        public ActionResult Chat()
+        {
+            var vm = new Chat.ChatData();
+            return View(vm);
+        }
     }
 }
