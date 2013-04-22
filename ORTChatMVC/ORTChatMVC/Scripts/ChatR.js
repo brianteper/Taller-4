@@ -15,6 +15,7 @@
             $("#send").click(function () {
                 var myName = $("#Name").val();
                 var myMessage = $("#Message").val();
+                $("#Message").val('');
                 myConnection.send(JSON.stringify({ name: myName, message: myMessage }));
             })
         });
