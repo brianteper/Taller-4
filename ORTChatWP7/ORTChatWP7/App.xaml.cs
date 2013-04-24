@@ -12,6 +12,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
+using ORTChatWP7.SignalR;
+using Microsoft.Phone.Info;
 
 namespace ORTChatWP7
 {
@@ -21,7 +23,32 @@ namespace ORTChatWP7
         /// Provides easy access to the root frame of the Phone Application.
         /// </summary>
         /// <returns>The root frame of the Phone Application.</returns>
-        public PhoneApplicationFrame RootFrame { get; private set; }
+        public PhoneApplicationFrame RootFrame
+        {
+            get;
+            private set;
+        }
+
+        public string DeviceID
+        {
+            get;
+            set;
+        }
+        public string ChatUserName
+        {
+            get;
+            set;
+        }
+        public ISignalRHub SignalRHub
+        {
+            get;
+            set;
+        }
+
+        public static new App Current
+        {
+            get { return Application.Current as App; }
+        }
 
         /// <summary>
         /// Constructor for the Application object.
@@ -36,6 +63,8 @@ namespace ORTChatWP7
 
             // Phone-specific initialization
             InitializePhoneApplication();
+
+            DeviceID = this.GetDeviceUniqueID();
 
             // Show graphics profiling information while debugging.
             if (System.Diagnostics.Debugger.IsAttached)
@@ -101,6 +130,17 @@ namespace ORTChatWP7
                 // An unhandled exception has occurred; break into the debugger
                 System.Diagnostics.Debugger.Break();
             }
+        }
+
+        private string GetDeviceUniqueID()
+        {
+            string result = string.Empty;
+            object uniqueId;
+
+            if (DeviceExtendedProperties.TryGetValue("DeviceUniqueId", out uniqueId))
+                result = Convert.ToBase64String((byte[])uniqueId);
+
+            return result;
         }
 
         #region Phone application initialization
