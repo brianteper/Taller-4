@@ -17,6 +17,7 @@ namespace ORTChatMVC
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+            RouteTable.Routes.MapHubs();
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

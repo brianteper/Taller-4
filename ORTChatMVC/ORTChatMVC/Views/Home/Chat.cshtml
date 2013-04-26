@@ -7,12 +7,17 @@
 
 @using (Html.BeginForm())
 {
-    @Html.EditorForModel();
-
+    <label>Name</label>
+    <input type="text" id="name" />
+    <label>Message</label>
+    <input type="text" id="message" />
+    <br />
     <input id="send" value="Send" type="button" />
+    <input id="clear" value="Clear" type="button" />
     <ul id="messages" style="list-style: none;"></ul>
 }
 
 @section Scripts {
     <script src="~/Scripts/ChatR.js"></script>
 }
+

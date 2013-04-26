@@ -13,7 +13,7 @@ namespace ORTChatMVC
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            RouteTable.Routes.MapConnection<Chat.ChatConnection>("chat", "/chat");
+            //RouteTable.Routes.MapConnection<Chat.ChatConnection>("chat", "/chat");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(

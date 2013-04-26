@@ -1,22 +1,21 @@
 ﻿$(function () {
-    var myConnection = $.connection("/chat");
+    var myConnection = $.connection.chatHub;
 
-    myConnection.received(function (data) {
-        $("#messages").append("<li>" + data.Name + ': ' + data.Message + "</li>");
+    $.connection.hub.start();
+
+    myConnection.client.addChatMessage = function (data) {
+        var info = JSON.parse(data);
+        $("#messages").append("<li>" + info.name + ': ' + info.message + "</li>");
+    };
+
+    $('#send').click(function () {
+        var myName = $("#name").val();
+        var myMessage = $("#message").val();
+        $("#message").val('');
+        myConnection.server.pushMessageToClients(JSON.stringify({ name: myName, message: myMessage }));
     });
 
-    myConnection.error(function (error) {
-        console.warn(error);
+    $('#clear').click(function () {
+        $('#messages li').remove();
     });
-
-    myConnection.start()
-        .promise()
-        .done(function () {
-            $("#send").click(function () {
-                var myName = $("#Name").val();
-                var myMessage = $("#Message").val();
-                $("#Message").val('');
-                myConnection.send(JSON.stringify({ name: myName, message: myMessage }));
-            })
-        });
 });
