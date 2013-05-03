@@ -9,7 +9,6 @@ using System.Web;
 
 namespace ORTChatMVC.SignalRHubs
 {
-    [HubName("chatHub")]
     public class ChatHub : Hub
     {
         // List of connected Phone clients on server .. feel free to persist or use this list however.
@@ -25,7 +24,7 @@ namespace ORTChatMVC.SignalRHubs
             };
             PcClientList.Add(pcClientToAdd);
 
-            return Clients.All.addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = "A new user has joined the room" }));
+            return Clients.AllExcept(Context.ConnectionId).addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = "A new user has joined the room" }));
         }
 
         public override Task OnDisconnected()
@@ -43,7 +42,7 @@ namespace ORTChatMVC.SignalRHubs
 
             PcClientList.Remove(client);
 
-            return Clients.All.addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = string.Format("{0} has left the room.", client.UserName) }));
+            return Clients.AllExcept(Context.ConnectionId).addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = string.Format("{0} has left the room.", !String.IsNullOrEmpty(client.UserName) ? "'" + client.UserName + "'" : "An user") }));
         }
 
         // SignalR method call to add a new Phone client connection & join chatroom.
@@ -83,7 +82,20 @@ namespace ORTChatMVC.SignalRHubs
             // RemoveFromGroup("ChatRoom A");
         }
 
-        // Get chatty.
+        public void SomeoneIsTyping(string data)
+        {
+            var info = (dynamic)JsonConvert.DeserializeObject(data);
+            info.connectionId = Context.ConnectionId;
+
+            Clients.AllExcept(Context.ConnectionId).showIsTyping(JsonConvert.SerializeObject(info));
+        }
+
+        public void FinishTyping()
+        {
+            Clients.AllExcept(Context.ConnectionId).hideIsTyping(JsonConvert.SerializeObject(new { connectionId = Context.ConnectionId }));
+        }
+
+        // Get chatty.  
         public void PushMessageToClients(string data)
         {
             var info = (dynamic)JsonConvert.DeserializeObject(data);

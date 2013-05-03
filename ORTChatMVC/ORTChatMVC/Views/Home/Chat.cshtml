@@ -8,13 +8,14 @@
 @using (Html.BeginForm())
 {
     <label>Name</label>
-    <input type="text" id="name" />
+    <input type="text" id="name" /><label id="nameError" style="display: none; color: red;">Please enter your name</label>
     <label>Message</label>
     <input type="text" id="message" />
     <br />
     <input id="send" value="Send" type="button" />
     <input id="clear" value="Clear" type="button" />
-    <ul id="messages" style="list-style: none;"></ul>
+    <ul id="messages"></ul>
+    <ul id="isTyping" style="list-style: none;"></ul>
 }
 
 @section Scripts {

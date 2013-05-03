@@ -21,7 +21,7 @@ namespace ORTChatWP7.SignalR
         IHubProxy SignalRChatHub;
 
         // Use the specific port# for local server or URI if hosted.        
-        HubConnection chatConnection = new HubConnection("http://localhost:18966/");
+        HubConnection chatConnection = new HubConnection("http://localhost:17991/");
 
         public event SignalRServerHandler SignalRServerNotification;
 
@@ -32,7 +32,7 @@ namespace ORTChatWP7.SignalR
         public SignalRMessagingHub()
         {
             // Reference to SignalR Server Hub & Proxy.                      
-            SignalRChatHub = chatConnection.CreateProxy("SignalRHubs.ChatHub");
+            SignalRChatHub = chatConnection.CreateProxy("ORTChatMVC.SignalRHubs.ChatHub");
         }
 
         #endregion
