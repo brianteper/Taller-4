@@ -11,4 +11,10 @@ namespace ORTChatWP8.SignalR
         public string ChatUserName { get; set; }
         public string ChatMessage { get; set; }
     }
+
+    public class ChatServer
+    {
+        public string Name { get; set; }
+        public string Message { get; set; }
+    }
 }

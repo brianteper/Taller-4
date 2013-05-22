@@ -27,12 +27,12 @@
         </StackPanel>
 
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <StackPanel Orientation="Vertical" VerticalAlignment="Bottom">
+            <StackPanel Name="stackPanel" Orientation="Vertical" VerticalAlignment="Bottom">
                 <ScrollViewer Height="520" Margin="0,-30,0,0">
-                    <TextBlock Name="chatDialog" Width="430" Padding="10,5,5,5"  
-                           Foreground="{StaticResource PhoneAccentBrush}" FontSize="36"/>
+                    <TextBlock Name="chatDialog" Width="416" Padding="10,5,5,5"  
+                           Foreground="{StaticResource PhoneAccentBrush}" FontSize="36" TextWrapping="Wrap"/>
                 </ScrollViewer>
-                <TextBox Name="chatTextbox" MaxLength="20" Width="450" HorizontalAlignment="Center"/>
+                <TextBox Name="chatTextbox" MaxLength="500" Width="450" TextWrapping="Wrap" HorizontalAlignment="Center" MouseEnter="chatTextbox_MouseEnter" MouseLeave="chatTextbox_MouseLeave"/>
             </StackPanel>
         </Grid>
     </Grid>

@@ -103,6 +103,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
+    <Compile Include="SignalR\SignalRTypingArgs.cs" />
     <Compile Include="SignalR\ISignalRHub.cs" />
     <Compile Include="SignalR\SignalREventArgs.cs" />
     <Compile Include="SignalR\SignalRMessagingHub.cs" />

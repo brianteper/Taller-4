@@ -12,6 +12,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using ORTChatWP8.SignalR;
 using Microsoft.Phone.Controls;
+using System.Threading.Tasks;
 
 namespace ORTChatWP8.Views
 {
@@ -75,9 +76,19 @@ namespace ORTChatWP8.Views
 
             // Wire-up to listen to custom event from SignalR Hub.
             App.Current.SignalRHub.SignalRServerNotification += new SignalRServerHandler(SignalRHub_SignalRServerNotification);
+            App.Current.SignalRHub.SignalRSomeoneIsTyping += new SignalRServerTypingHandler(SignalRHub_SignalRSomeoneIsTyping);
+            App.Current.SignalRHub.SignalRHideIsTyping += new SignalRServerTypingHandler(SignalRHub_SignalRHideIsTyping);
 
             // Send to server for joining Chatroom.
-            App.Current.SignalRHub.JoinChat(phoneToChat);
+            try
+            {
+                App.Current.SignalRHub.JoinChat(phoneToChat);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Hubo un error al intentar conectar con el servidor de chat, por favor intente nuevamente.");
+                this.NavigationService.GoBack();
+            }
         }
 
         protected override void OnNavigatedFrom(System.Windows.Navigation.NavigationEventArgs e)
@@ -89,6 +100,8 @@ namespace ORTChatWP8.Views
 
             // Unwire.
             App.Current.SignalRHub.SignalRServerNotification -= new SignalRServerHandler(SignalRHub_SignalRServerNotification);
+            App.Current.SignalRHub.SignalRSomeoneIsTyping -= new SignalRServerTypingHandler(SignalRHub_SignalRSomeoneIsTyping);
+            App.Current.SignalRHub.SignalRHideIsTyping -= new SignalRServerTypingHandler(SignalRHub_SignalRHideIsTyping);
 
             // Fire off background thread to leave server Chatroom.               
             DisconnectBackgroundDataWorker.RunWorkerAsync();
@@ -101,6 +114,40 @@ namespace ORTChatWP8.Views
                 // Add to local ChatRoom.
                 chatDialog.Text += "\r\n" + e.ChatMessageFromServer;
             }));
+        }
+
+        protected void SignalRHub_SignalRSomeoneIsTyping(object sender, SignalRTypingArgs e)
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                TextBox txtName = new TextBox();
+                txtName.Name = e.ConnectionId;
+                txtName.Text = e.Name + " is typing...";
+
+                if (this.FindName(txtName.Name) == null)
+                {
+                    stackPanel.Children.Add(txtName);
+                }
+            }));
+        }
+
+        protected void SignalRHub_SignalRHideIsTyping(object sender, SignalRTypingArgs e)
+        {
+            Deployment.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                stackPanel.Children.Remove((UIElement)this.FindName(e.ConnectionId));
+                //stackPanel.UpdateLayout();
+            }));
+        }
+
+        private void chatTextbox_MouseEnter(object sender, MouseEventArgs e)
+        {
+            //App.Current.SignalRHub.SomeoneIsTyping(phoneToChat);
+        }
+
+        private void chatTextbox_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //App.Current.SignalRHub.HideIsTyping(phoneToChat);
         }
     }
 }
