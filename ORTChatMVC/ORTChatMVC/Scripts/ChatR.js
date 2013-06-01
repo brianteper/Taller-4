@@ -43,7 +43,10 @@
 
     $('#message').keypress(function (e) {
         if (e.which == 13) {
-            $('#send').click();
+            var myMessage = $('#message').val();
+            if (myMessage != "") {
+                $('#send').click();
+            }
         }
     });
 

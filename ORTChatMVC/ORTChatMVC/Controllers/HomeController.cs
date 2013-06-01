@@ -31,7 +31,6 @@ namespace ORTChatMVC.Controllers
 
         public ActionResult Chat()
         {
-            //var vm = new Chat.ChatData();
             return View();
         }
     }

@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Microsoft.AspNet.SignalR;
-using ORTChatMVC.Chat;
 
 namespace ORTChatMVC
 {
@@ -13,7 +12,6 @@ namespace ORTChatMVC
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            //RouteTable.Routes.MapConnection<Chat.ChatConnection>("chat", "/chat");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(

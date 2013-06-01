@@ -5,7 +5,7 @@ using System.Web;
 
 namespace ORTChatMVC.SignalRHubs
 {
-    public class PcClient
+    public class Client
     {
         public string ClientId
         {

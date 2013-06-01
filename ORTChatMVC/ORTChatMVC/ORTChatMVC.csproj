@@ -196,11 +196,8 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Chat\ChatConnection.cs" />
-    <Compile Include="Chat\ChatData.cs" />
     <Compile Include="SignalRHubs\ChatHub.cs" />
-    <Compile Include="SignalRHubs\PcClient.cs" />
-    <Compile Include="SignalRHubs\PhoneClient.cs" />
+    <Compile Include="SignalRHubs\Client.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Filters\InitializeSimpleMembershipAttribute.cs" />
@@ -269,6 +266,7 @@
     <Content Include="Global.asax" />
     <None Include="Properties\PublishProfiles\ortchat.pubxml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
+    <Content Include="Images\ort.jpg" />
     <Content Include="Scripts\ChatR.js" />
     <Content Include="Scripts\jquery-1.8.2.js" />
     <Content Include="Scripts\jquery-1.8.2.min.js" />

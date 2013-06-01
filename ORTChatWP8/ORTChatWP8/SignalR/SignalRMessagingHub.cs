@@ -8,7 +8,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNet.SignalR.Client.Hubs;
 using Newtonsoft.Json;
@@ -20,7 +19,7 @@ namespace ORTChatWP8.SignalR
         IHubProxy SignalRChatHub;
 
         // Use the specific port# for local server or URI if hosted.        
-        HubConnection chatConnection = new HubConnection("http://169.254.80.80:17991/");
+        HubConnection chatConnection = new HubConnection("http://10.0.1.25:17991/");
 
         public event SignalRServerHandler SignalRServerNotification;
         public event SignalRServerTypingHandler SignalRSomeoneIsTyping;
@@ -85,7 +84,7 @@ namespace ORTChatWP8.SignalR
         public virtual void SomeoneIsTyping(ChatClient phoneChatMessage)
         {
             // Post message to Server Chatroom.
-            SignalRChatHub.Invoke("SomeoneIsTyping", JsonConvert.SerializeObject(new { name = phoneChatMessage.ChatUserName })).Wait();
+            SignalRChatHub.Invoke("SomeoneIsTyping", phoneChatMessage.ChatUserName).Wait();
         }
 
         public virtual void HideIsTyping(ChatClient phoneChatMessage)

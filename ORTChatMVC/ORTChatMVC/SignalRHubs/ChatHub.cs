@@ -12,26 +12,30 @@ namespace ORTChatMVC.SignalRHubs
     public class ChatHub : Hub
     {
         // List of connected Phone clients on server .. feel free to persist or use this list however.
-        private static List<PhoneClient> PhoneClientList = new List<PhoneClient>();
-        private static List<PcClient> PcClientList = new List<PcClient>();
+        private static List<Client> clientList = new List<Client>();
 
         public override Task OnConnected()
         {
-            PcClient pcClientToAdd = new PcClient()
+            Client clientToAdd = new Client()
             {
                 ClientId = Context.ConnectionId,
                 UserName = String.Empty
             };
-            PcClientList.Add(pcClientToAdd);
 
-            return Clients.AllExcept(Context.ConnectionId).addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = "A new user has joined the room" }));
+            if (clientList.Any(c => c.ClientId == clientToAdd.ClientId))
+            {
+                return null;
+            }
+
+            clientList.Add(clientToAdd);
+            return Clients.AllExcept(Context.ConnectionId).addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = "A new user has joined the room" + (Context.QueryString[0] == "webSockets" ? " from a PC" : " from a PHONE") }));
         }
 
         public override Task OnDisconnected()
         {
-            PcClient client = null;
+            Client client = null;
 
-            foreach (PcClient existingClient in PcClientList)
+            foreach (Client existingClient in clientList)
             {
                 if (Context.ConnectionId == existingClient.ClientId)
                 {
@@ -40,34 +44,41 @@ namespace ORTChatMVC.SignalRHubs
                 }
             }
 
-            PcClientList.Remove(client);
+            clientList.Remove(client);
+
+            if (client == null)
+            {
+                return null;
+            }
 
             return Clients.AllExcept(Context.ConnectionId).addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = string.Format("{0} has left the room.", !String.IsNullOrEmpty(client.UserName) ? "'" + client.UserName + "'" : "An user") }));
         }
 
         // SignalR method call to add a new Phone client connection & join chatroom.
-        public void JoinFromPhone(string phoneID, string chatUserName)
-        {
-            PhoneClient phoneClientToAdd = new PhoneClient()
-            {
-                PhoneClientId = phoneID,
-                UserName = chatUserName
-            };
+        //public void JoinFromPhone(string chatUserName)
+        //{
+        //    Client clientToAdd = new Client()
+        //    {
+        //        ClientId = Context.ConnectionId,
+        //        UserName = chatUserName
+        //    };
 
-            PhoneClientList.Add(phoneClientToAdd);
+        //    clientList.Add(clientToAdd);
 
-            // Guess what this does?
-            // AddToGroup("ChatRoom A");
-        }
+        //    Clients.AllExcept(Context.ConnectionId).addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = String.Format("{0} has joined the room from a phone", chatUserName) }));
+
+        //    // Guess what this does?
+        //    // AddToGroup("ChatRoom A");
+        //}
 
         // Disconnect given Phone client & leave chatroom.
-        public void Disconnect(string phoneID, string chatUserName)
+        public void DisconnectFromPhone(string chatUserName)
         {
-            PhoneClient client = null;
+            Client client = null;
 
-            foreach (PhoneClient existingClient in PhoneClientList)
+            foreach (Client existingClient in clientList)
             {
-                if (phoneID == existingClient.PhoneClientId)
+                if (Context.ConnectionId == existingClient.ClientId)
                 {
                     client = existingClient;
                     break;
@@ -75,11 +86,18 @@ namespace ORTChatMVC.SignalRHubs
             }
 
             // Cleanup & remove from chatroom.
-            PhoneClientList.Remove(client);
+            clientList.Remove(client);
             Clients.All.removeClient(Clients.Caller);
 
+            Clients.AllExcept(Context.ConnectionId).addChatMessage(JsonConvert.SerializeObject(new { name = "Server", message = string.Format("{0} has left the room.", chatUserName) }));
             // Pop out of group.
             // RemoveFromGroup("ChatRoom A");
+        }
+
+        public void PushMessageFromPhone(string chatUserName, string message)
+        {
+            // Push to all connected clients.
+            Clients.All.addChatMessage(JsonConvert.SerializeObject(new { name = chatUserName, message = message }));
         }
 
         public void SomeoneIsTyping(string data)
@@ -100,7 +118,7 @@ namespace ORTChatMVC.SignalRHubs
         {
             var info = (dynamic)JsonConvert.DeserializeObject(data);
 
-            foreach (PcClient existingClient in PcClientList)
+            foreach (Client existingClient in clientList)
             {
                 if (Context.ConnectionId == existingClient.ClientId)
                 {

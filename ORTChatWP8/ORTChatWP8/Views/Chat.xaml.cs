@@ -19,6 +19,7 @@ namespace ORTChatWP8.Views
     public partial class Chat : PhoneApplicationPage
     {
         ChatClient phoneToChat = new ChatClient();
+        bool isTyping = false;
 
         BackgroundWorker ChatBackgroundDataWorker = new BackgroundWorker();
         BackgroundWorker DisconnectBackgroundDataWorker = new BackgroundWorker();
@@ -41,8 +42,6 @@ namespace ORTChatWP8.Views
         {
             if (chatTextbox.Text.Trim() != string.Empty)
             {
-                phoneToChat.PhoneClientId = App.Current.DeviceID;
-                phoneToChat.ChatUserName = App.Current.ChatUserName;
                 phoneToChat.ChatMessage = chatTextbox.Text.Trim();
                 chatTextbox.Text = string.Empty;
 
@@ -67,7 +66,6 @@ namespace ORTChatWP8.Views
         {
             base.OnNavigatedTo(e);
 
-            ChatClient phoneToChat = new ChatClient();
             phoneToChat.PhoneClientId = App.Current.DeviceID;
             phoneToChat.ChatUserName = App.Current.ChatUserName;
 
@@ -95,16 +93,13 @@ namespace ORTChatWP8.Views
         {
             base.OnNavigatedFrom(e);
 
-            phoneToChat.PhoneClientId = App.Current.DeviceID;
-            phoneToChat.ChatUserName = App.Current.ChatUserName;
+            // Fire off background thread to leave server Chatroom.               
+            DisconnectBackgroundDataWorker.RunWorkerAsync();
 
             // Unwire.
             App.Current.SignalRHub.SignalRServerNotification -= new SignalRServerHandler(SignalRHub_SignalRServerNotification);
             App.Current.SignalRHub.SignalRSomeoneIsTyping -= new SignalRServerTypingHandler(SignalRHub_SignalRSomeoneIsTyping);
             App.Current.SignalRHub.SignalRHideIsTyping -= new SignalRServerTypingHandler(SignalRHub_SignalRHideIsTyping);
-
-            // Fire off background thread to leave server Chatroom.               
-            DisconnectBackgroundDataWorker.RunWorkerAsync();
         }
 
         protected void SignalRHub_SignalRServerNotification(object sender, SignalREventArgs e)
@@ -113,6 +108,7 @@ namespace ORTChatWP8.Views
             {
                 // Add to local ChatRoom.
                 chatDialog.Text += "\r\n" + e.ChatMessageFromServer;
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.ExtentHeight + 100);
             }));
         }
 
@@ -136,18 +132,17 @@ namespace ORTChatWP8.Views
             Deployment.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 stackPanel.Children.Remove((UIElement)this.FindName(e.ConnectionId));
-                //stackPanel.UpdateLayout();
             }));
         }
 
-        private void chatTextbox_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //App.Current.SignalRHub.SomeoneIsTyping(phoneToChat);
-        }
+        //private void chatTextbox_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    App.Current.SignalRHub.SomeoneIsTyping(phoneToChat);
+        //}
 
-        private void chatTextbox_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //App.Current.SignalRHub.HideIsTyping(phoneToChat);
-        }
+        //private void chatTextbox_KeyUp(object sender, KeyEventArgs e)
+        //{
+        //    App.Current.SignalRHub.HideIsTyping(phoneToChat);
+        //}
     }
 }
