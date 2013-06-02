@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORTChatMVC", "ORTChatMVC\ORTChatMVC.csproj", "{9C8C4787-10E3-43CF-89AD-BE1FA16FDB34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORTChatWP8", "..\ORTChatWP8\ORTChatWP8\ORTChatWP8.csproj", "{97B6D296-7B35-4E8B-A93C-E55409C8A58B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ORTChatWP8", "ORTChatWP8\ORTChatWP8.csproj", "{97B6D296-7B35-4E8B-A93C-E55409C8A58B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
