@@ -18,7 +18,7 @@ namespace ORTChatWP8.SignalR
     {
         IHubProxy SignalRChatHub;
 
-        // Use the specific port# for local server or URI if hosted.        
+        //Instanciamos la conexión con el hub en la url especificada
         HubConnection chatConnection = new HubConnection("http://10.0.1.25:17991/");
 
         public event SignalRServerHandler SignalRServerNotification;
@@ -27,30 +27,29 @@ namespace ORTChatWP8.SignalR
 
         public SignalRMessagingHub()
         {
-            // Reference to SignalR Server Hub & Proxy.                      
+            //Referenciamos al Hub y Proxy de SignalR
             SignalRChatHub = chatConnection.CreateHubProxy("ChatHub");
         }
 
         public virtual void JoinChat(ChatClient phoneChatMessage)
         {
-            // Fire up SignalR Connection & join chatroom.  
-            // Join the Server's list of Chatroom clients.
+            //Disparamos la conexión y nos unimos a la sala
             chatConnection.Start().ContinueWith(task =>
             {
                 if (task.IsFaulted)
                 {
-                    // Oopsie, do some error handling.
+                    //Manejar el error ante un fallo en la conexión
                 }
             });
 
-            // Listen to chat events on SignalR Server & wire them up appropriately.
+            //Escuchamos los eventos del servidor y los disparamos
             SignalRChatHub.On<string>("addChatMessage", message =>
             {
                 SignalREventArgs chatArgs = new SignalREventArgs();
                 var serverMsg = JsonConvert.DeserializeObject<ChatServer>(message);
                 chatArgs.ChatMessageFromServer = serverMsg.Name + ": " + serverMsg.Message;
 
-                // Raise custom event & let it bubble up.
+                //Disparamos nuestro evento local
                 OnSignalRServerNotificationReceived(chatArgs);
             });
 
@@ -58,7 +57,6 @@ namespace ORTChatWP8.SignalR
             {
                 SignalRTypingArgs typingArgs = JsonConvert.DeserializeObject<SignalRTypingArgs>(info);
 
-                // Raise custom event & let it bubble up.
                 OnSignalRSomeoneIsTyping(typingArgs);
             });
 
@@ -66,32 +64,31 @@ namespace ORTChatWP8.SignalR
             {
                 SignalRTypingArgs typingArgs = JsonConvert.DeserializeObject<SignalRTypingArgs>(info);
 
-                // Raise custom event & let it bubble up.
                 OnSignalRHideIsTyping(typingArgs);
             });
         }
 
         public virtual void Chat(ChatClient phoneChatMessage)
         {
-            // Post message to Server Chatroom.
+            //Posteamos el mensaje al server
             SignalRChatHub.Invoke("PushMessageFromPhone", phoneChatMessage.ChatUserName, phoneChatMessage.ChatMessage).Wait();
         }
 
         public virtual void SomeoneIsTyping(ChatClient phoneChatMessage)
         {
-            // Post message to Server Chatroom.
+            //Posteamos al server que alguien comenzó a escribir
             SignalRChatHub.Invoke("SomeoneIsTyping", phoneChatMessage.ChatUserName).Wait();
         }
 
         public virtual void HideIsTyping(ChatClient phoneChatMessage)
         {
-            // Post message to Server Chatroom.
+            //Posteamos al server que se dejó de escribir
             SignalRChatHub.Invoke("FinishTyping").Wait();
         }
 
         public virtual void LeaveChat(ChatClient phoneChatMessage)
         {
-            // Leave the Server's Chatroom.
+            //Dejamos la sala de chat
             SignalRChatHub.Invoke("DisconnectFromPhone", phoneChatMessage.ChatUserName).Wait();
         }
 

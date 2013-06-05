@@ -28,7 +28,7 @@ namespace ORTChatWP8.Views
         {
             InitializeComponent();
 
-            // Set up the background workers for Chat & Disconnect.
+            //Seteamos los BackgroundWorkers para chatear y desconectarse en segundo plano
             ChatBackgroundDataWorker.WorkerSupportsCancellation = false;
             ChatBackgroundDataWorker.WorkerReportsProgress = false;
             ChatBackgroundDataWorker.DoWork += new DoWorkEventHandler(ChatBackgroundDataWorker_DoWork);
@@ -42,23 +42,24 @@ namespace ORTChatWP8.Views
         {
             if (chatTextbox.Text.Trim() != string.Empty)
             {
+                //Guardamos el mensaje en el objeto a enviar al servidor y limpiamos el Textbox
                 phoneToChat.ChatMessage = chatTextbox.Text.Trim();
                 chatTextbox.Text = string.Empty;
 
-                // Fire off background thread to post message to server Chatroom.               
+                //Disparamos el Worker de manera asincrónica para postear el mensaje al servidor
                 ChatBackgroundDataWorker.RunWorkerAsync();
             }
         }
 
         private void ChatBackgroundDataWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // Send to server for adding message to Chatroom.
+            //Llamamos al servidor para postear el mensaje
             App.Current.SignalRHub.Chat(phoneToChat);
         }
 
         private void DisconnectBackgroundDataWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            // Leave Chatroom.
+            //Llamamos al servidor para salir de la sala de chat
             App.Current.SignalRHub.LeaveChat(phoneToChat);
         }
 
@@ -66,20 +67,21 @@ namespace ORTChatWP8.Views
         {
             base.OnNavigatedTo(e);
 
+            //Al iniciar la página, guardamos el ID del dispositivo y el nombre de usuario en el objeto a enviar al servidor
             phoneToChat.PhoneClientId = App.Current.DeviceID;
             phoneToChat.ChatUserName = App.Current.ChatUserName;
 
-            // Instantiate with default or any other implementation.
+            //Instanciamos el Hub para poder interactuar
             App.Current.SignalRHub = new SignalRMessagingHub();
 
-            // Wire-up to listen to custom event from SignalR Hub.
+            //Nos attacheamos a los eventos del servidor, para escuchar cuando se produce alguno de los mismos
             App.Current.SignalRHub.SignalRServerNotification += new SignalRServerHandler(SignalRHub_SignalRServerNotification);
             App.Current.SignalRHub.SignalRSomeoneIsTyping += new SignalRServerTypingHandler(SignalRHub_SignalRSomeoneIsTyping);
             App.Current.SignalRHub.SignalRHideIsTyping += new SignalRServerTypingHandler(SignalRHub_SignalRHideIsTyping);
 
-            // Send to server for joining Chatroom.
             try
             {
+                //Llamamos al servidor para unirnos a la sala
                 App.Current.SignalRHub.JoinChat(phoneToChat);
             }
             catch (Exception)
@@ -93,10 +95,10 @@ namespace ORTChatWP8.Views
         {
             base.OnNavigatedFrom(e);
 
-            // Fire off background thread to leave server Chatroom.               
+            //Disparamos el Worker de manera asincrónica para dejar la sala
             DisconnectBackgroundDataWorker.RunWorkerAsync();
 
-            // Unwire.
+            //Nos dettacheamos de los eventos del servidor
             App.Current.SignalRHub.SignalRServerNotification -= new SignalRServerHandler(SignalRHub_SignalRServerNotification);
             App.Current.SignalRHub.SignalRSomeoneIsTyping -= new SignalRServerTypingHandler(SignalRHub_SignalRSomeoneIsTyping);
             App.Current.SignalRHub.SignalRHideIsTyping -= new SignalRServerTypingHandler(SignalRHub_SignalRHideIsTyping);
@@ -104,9 +106,9 @@ namespace ORTChatWP8.Views
 
         protected void SignalRHub_SignalRServerNotification(object sender, SignalREventArgs e)
         {
+            //Al enviarse un nuevo mensaje desde el servidor, lo agregamos a la conversación local
             Deployment.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
-                // Add to local ChatRoom.
                 chatDialog.Text += "\r\n" + e.ChatMessageFromServer;
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.ExtentHeight + 100);
             }));
@@ -114,6 +116,7 @@ namespace ORTChatWP8.Views
 
         protected void SignalRHub_SignalRSomeoneIsTyping(object sender, SignalRTypingArgs e)
         {
+            //Al comenzar un usuario a escribir, el servidor nos notifica y lo mostramos en pantalla
             Deployment.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 TextBox txtName = new TextBox();
@@ -129,20 +132,11 @@ namespace ORTChatWP8.Views
 
         protected void SignalRHub_SignalRHideIsTyping(object sender, SignalRTypingArgs e)
         {
+            //Cuando un usuario deja de escribir, el servidor nos notifica y lo mostramos en pantalla
             Deployment.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 stackPanel.Children.Remove((UIElement)this.FindName(e.ConnectionId));
             }));
         }
-
-        //private void chatTextbox_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    App.Current.SignalRHub.SomeoneIsTyping(phoneToChat);
-        //}
-
-        //private void chatTextbox_KeyUp(object sender, KeyEventArgs e)
-        //{
-        //    App.Current.SignalRHub.HideIsTyping(phoneToChat);
-        //}
     }
 }

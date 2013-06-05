@@ -21,6 +21,7 @@ namespace ORTChatWP8.Views
 
         private void nameTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            //Habilitamos el botón para pasar a la siguiente pantalla según se haya ingresado texto o no
             if (nameTextBox.Text.Trim().Length > 0)
                 goButton.IsEnabled = true;
             else
@@ -29,6 +30,7 @@ namespace ORTChatWP8.Views
 
         private void goButton_Click(object sender, RoutedEventArgs e)
         {
+            //Guardamos el nombre de usuario ingresado
             App.Current.ChatUserName = nameTextBox.Text.Trim();
             this.NavigationService.Navigate(new Uri("/Views/Chat.xaml", UriKind.Relative));
         }
