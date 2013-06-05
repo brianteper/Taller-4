@@ -14,6 +14,7 @@ namespace ORTChatMVC
             bundles.Add(new ScriptBundle("~/bundles/jqueryui").Include(
                         "~/Scripts/jquery-ui-{version}.js"));
 
+            //Agregamos el bundle de SignalR
             bundles.Add(new ScriptBundle("~/bundles/jquerysignalr").Include(
                       "~/Scripts/jquery.signalR-{version}.js"));
 

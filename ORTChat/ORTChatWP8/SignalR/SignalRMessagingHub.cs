@@ -34,14 +34,10 @@ namespace ORTChatWP8.SignalR
         public virtual void JoinChat(ChatClient phoneChatMessage)
         {
             // Fire up SignalR Connection & join chatroom.  
+            // Join the Server's list of Chatroom clients.
             chatConnection.Start().ContinueWith(task =>
             {
-                if (!task.IsFaulted)
-                {
-                    // Join the Server's list of Chatroom clients.
-                    //SignalRChatHub.Invoke("JoinFromPhone", phoneChatMessage.ChatUserName).Wait();
-                }
-                else
+                if (task.IsFaulted)
                 {
                     // Oopsie, do some error handling.
                 }
