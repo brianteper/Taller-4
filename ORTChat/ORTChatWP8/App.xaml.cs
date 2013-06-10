@@ -1,56 +1,21 @@
-﻿using System;
-using System.Diagnostics;
-using System.Resources;
-using System.Windows;
-using System.Windows.Markup;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using ORTChatWP8.Resources;
-using Microsoft.Phone.Info;
-using ORTChatWP8.SignalR;
-
-namespace ORTChatWP8
+﻿namespace ORTChatWP8
 {
+    using System;
+    using System.Diagnostics;
+    using System.Resources;
+    using System.Windows;
+    using System.Windows.Markup;
+    using System.Windows.Navigation;
+    using Microsoft.Phone.Controls;
+    using Microsoft.Phone.Info;
+    using Microsoft.Phone.Shell;
+    using ORTChatWP8.Resources;
+    using ORTChatWP8.SignalR;
+
     public partial class App : Application
     {
-        private string GetDeviceUniqueID()
-        {
-            string result = string.Empty;
-            object uniqueId;
-
-            if (DeviceExtendedProperties.TryGetValue("DeviceUniqueId", out uniqueId))
-                result = Convert.ToBase64String((byte[])uniqueId);
-
-            return result;
-        }
-
-        public string DeviceID
-        {
-            get;
-            set;
-        }
-        public string ChatUserName
-        {
-            get;
-            set;
-        }
-        public ISignalRHub SignalRHub
-        {
-            get;
-            set;
-        }
-
-        public static new App Current
-        {
-            get { return Application.Current as App; }
-        }
-
-        /// <summary>
-        /// Provides easy access to the root frame of the Phone Application.
-        /// </summary>
-        /// <returns>The root frame of the Phone Application.</returns>
-        public static PhoneApplicationFrame RootFrame { get; private set; }
+        // Avoid double-initialization
+        private bool phoneApplicationInitialized = false;
 
         /// <summary>
         /// Constructor for the Application object.
@@ -58,18 +23,18 @@ namespace ORTChatWP8
         public App()
         {
             // Global handler for uncaught exceptions.
-            UnhandledException += Application_UnhandledException;
+            this.UnhandledException += this.Application_UnhandledException;
 
             // Standard XAML initialization
-            InitializeComponent();
+            this.InitializeComponent();
 
             // Phone-specific initialization
-            InitializePhoneApplication();
+            this.InitializePhoneApplication();
 
             // Language display initialization
-            InitializeLanguage();
+            this.InitializeLanguage();
 
-            DeviceID = this.GetDeviceUniqueID();
+            this.DeviceID = this.GetDeviceUniqueID();
 
             // Show graphics profiling information while debugging.
             if (Debugger.IsAttached)
@@ -90,7 +55,42 @@ namespace ORTChatWP8
                 // and consume battery power when the user is not using the phone.
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
+        }
 
+        public static new App Current
+        {
+            get
+            {
+                return Application.Current as App;
+            }
+        }
+
+        /// <summary>
+        /// Provides easy access to the root frame of the Phone Application.
+        /// </summary>
+        /// <returns>The root frame of the Phone Application.</returns>
+        public static PhoneApplicationFrame RootFrame
+        {
+            get;
+            private set;
+        }
+
+        public string DeviceID
+        {
+            get;
+            set;
+        }
+
+        public string ChatUserName
+        {
+            get;
+            set;
+        }
+
+        public ISignalRHub SignalRHub
+        {
+            get;
+            set;
         }
 
         // Code to execute when the application is launching (eg, from Start)
@@ -137,41 +137,55 @@ namespace ORTChatWP8
             }
         }
 
-        #region Phone application initialization
+        private string GetDeviceUniqueID()
+        {
+            string result = string.Empty;
+            object uniqueId;
 
-        // Avoid double-initialization
-        private bool phoneApplicationInitialized = false;
+            if (DeviceExtendedProperties.TryGetValue("DeviceUniqueId", out uniqueId))
+            {
+                result = Convert.ToBase64String((byte[])uniqueId);
+            }
+
+            return result;
+        }
+
+        #region Phone application initialization
 
         // Do not add any additional code to this method
         private void InitializePhoneApplication()
         {
-            if (phoneApplicationInitialized)
+            if (this.phoneApplicationInitialized)
+            {
                 return;
+            }
 
             // Create the frame but don't set it as RootVisual yet; this allows the splash
             // screen to remain active until the application is ready to render.
             RootFrame = new PhoneApplicationFrame();
-            RootFrame.Navigated += CompleteInitializePhoneApplication;
+            RootFrame.Navigated += this.CompleteInitializePhoneApplication;
 
             // Handle navigation failures
-            RootFrame.NavigationFailed += RootFrame_NavigationFailed;
+            RootFrame.NavigationFailed += this.RootFrame_NavigationFailed;
 
             // Handle reset requests for clearing the backstack
-            RootFrame.Navigated += CheckForResetNavigation;
+            RootFrame.Navigated += this.CheckForResetNavigation;
 
             // Ensure we don't initialize again
-            phoneApplicationInitialized = true;
+           this.phoneApplicationInitialized = true;
         }
 
         // Do not add any additional code to this method
         private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
         {
             // Set the root visual to allow the application to render
-            if (RootVisual != RootFrame)
-                RootVisual = RootFrame;
+            if (this.RootVisual != RootFrame)
+            {
+                this.RootVisual = RootFrame;
+            }
 
             // Remove this handler since it is no longer needed
-            RootFrame.Navigated -= CompleteInitializePhoneApplication;
+            RootFrame.Navigated -= this.CompleteInitializePhoneApplication;
         }
 
         private void CheckForResetNavigation(object sender, NavigationEventArgs e)
@@ -179,22 +193,26 @@ namespace ORTChatWP8
             // If the app has received a 'reset' navigation, then we need to check
             // on the next navigation to see if the page stack should be reset
             if (e.NavigationMode == NavigationMode.Reset)
-                RootFrame.Navigated += ClearBackStackAfterReset;
+            {
+                RootFrame.Navigated += this.ClearBackStackAfterReset;
+            }
         }
 
         private void ClearBackStackAfterReset(object sender, NavigationEventArgs e)
         {
             // Unregister the event so it doesn't get called again
-            RootFrame.Navigated -= ClearBackStackAfterReset;
+            RootFrame.Navigated -= this.ClearBackStackAfterReset;
 
             // Only clear the stack for 'new' (forward) and 'refresh' navigations
             if (e.NavigationMode != NavigationMode.New && e.NavigationMode != NavigationMode.Refresh)
+            {
                 return;
+            }
 
             // For UI consistency, clear the entire page stack
             while (RootFrame.RemoveBackEntry() != null)
             {
-                ; // do nothing
+                // do nothing
             }
         }
 
@@ -246,7 +264,6 @@ namespace ORTChatWP8
                 // ResourceLangauge not being correctly set to a supported language
                 // code or ResourceFlowDirection is set to a value other than LeftToRight
                 // or RightToLeft.
-
                 if (Debugger.IsAttached)
                 {
                     Debugger.Break();

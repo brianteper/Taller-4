@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace ORTChatMVC.SignalRHubs
+﻿namespace ORTChatMVC.SignalRHubs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Web;
+
     public class Client
     {
         public string ClientId

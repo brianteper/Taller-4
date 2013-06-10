@@ -39,7 +39,7 @@
 
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
-            <shell:ApplicationBarIconButton x:Name="sendChatBtn" IconUri="Assets/SendChat.png" Text="send chat" Click="sendChatBtn_Click"/>
+            <shell:ApplicationBarIconButton x:Name="SendChatBtn" IconUri="Assets/SendChat.png" Text="send chat" Click="SendChatBtn_Click"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 

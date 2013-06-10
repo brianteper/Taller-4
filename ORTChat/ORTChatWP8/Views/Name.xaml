@@ -29,8 +29,8 @@
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,-400,0,0">
                 <TextBlock Text="Please identify yourself:" Foreground="{StaticResource PhoneAccentBrush}" FontSize="32" Padding="20"/>
-                <TextBox Name="nameTextBox" Width="400" Margin="-28,0,0,20" MaxLength="25" TextChanged="nameTextBox_TextChanged"/>
-                <Button Name="goButton" Content="Let's go have fun!" Width="400" Margin="-28,0,0,0" Click="goButton_Click"/>
+                <TextBox Name="NameTextBox" Width="400" Margin="-28,0,0,20" MaxLength="25" TextChanged="NameTextBox_TextChanged"/>
+                <Button Name="GoButton" Content="Let's go have fun!" Width="400" Margin="-28,0,0,0" Click="GoButton_Click"/>
             </StackPanel>
         </Grid>
     </Grid>
